@@ -1,0 +1,24 @@
+.widget-dice {
+	button {
+		width: 48%;
+		float:left;
+		display: block;
+		padding:4px;
+		margin-bottom: 5px;
+
+		&:nth-child(odd) {
+			margin-right: 4%;
+		}
+	}
+
+	input {
+		width:48%;
+		margin-right: 4%;
+		padding:4px;
+		float: left;
+	}
+
+	.result {
+		margin-top: 3px;
+	}
+}

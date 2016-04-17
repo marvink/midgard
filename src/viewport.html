@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Midgard Viewport! (F11 für Fullscreen)</title>
+    <script>window.$ = window.jQuery = require('./js/jquery.js');</script>
+    <script src="./js/vendor.js"></script> 
+    <script src="./js/jquery.lettering.js"></script> 
+    <script src="./js/fittext.js"></script> 
+
+
+    <script>
+      const ipcRenderer = require('electron').ipcRenderer;
+      var $panzoom
+
+      ipcRenderer.on('asynchronous-reply', function(event, arg) {        
+        $('.message').html("<h2><div>"+arg+"</div></h2>");
+      }); 
+
+      ipcRenderer.on('image-reply', function(event, arg) {
+        console.log(arg)
+        $('.image').html('<div class="overflow" style="width:100vw; height:100vh;"><div class="panzoom"><img style="display:none" src="'+arg+'"/></div>');
+
+        $panzoom = $('.panzoom').panzoom();
+    
+        $panzoom.parent().on('mousewheel.focal', function( e ) {
+          e.preventDefault();
+          var delta = e.delta || e.originalEvent.wheelDelta;
+          var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
+          $panzoom.panzoom('zoom', zoomOut, {
+            increment: 0.1,
+            animate: false,
+            focal: e
+          });
+        });
+
+        $panzoom.on('panzoomchange', function(e, panzoom, transform) {
+          ipcRenderer.send("image-change", transform);
+        });
+      }); 
+
+      ipcRenderer.on('image-change-reply', function(event, arg) {        
+        $panzoom.off('panzoomchange');
+        
+        $panzoom.panzoom("setMatrix", arg);
+
+        $panzoom.on('panzoomchange', function(e, panzoom, transform) {
+          ipcRenderer.send("image-change", transform);
+        });
+      }); 
+
+      ipcRenderer.on('viewport-change', function(event, arg) {
+        $panzoom.panzoom('reset');
+        $panzoom.panzoom('resetDimensions');        
+      }); 
+
+      ipcRenderer.on('toggle-image-reply', function(event, arg) {
+        $('.image').find('img').css('display',arg);
+      }); 
+    </script>
+    <link rel="stylesheet" href="./css/viewport.css">
+
+  </head>
+  <body style="margin:0px; font-family: 'kingthings_foundationregular'">
+    <canvas id="fog" style="width: 100vw; height: 100vh; display:block;"></canvas>
+	
+    <script src="./js/fog.js"></script> 
+
+    <div class="message">
+    </div>
+
+    <div class="image">
+      
+    </div>
+  </body>
+</html>

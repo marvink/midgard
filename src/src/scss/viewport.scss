@@ -1,0 +1,64 @@
+@font-face {
+  font-family: 'kingthings_foundationregular';
+  src: url('../img/Kingthings_Exeter.ttf')  format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+	overflow:hidden;
+	width:1vw;	
+	height:1vh;
+}
+
+
+.message h2 {
+	font-weight: 200;
+	font-size:60px;
+	width: 80%;
+	overflow: hidden;
+	padding: 0;
+	margin: 0 0 0 -40%;
+	position: absolute;
+	z-index:100;
+	letter-spacing:4px;
+	top: 42%;
+	left: 50%;
+	text-align: center;
+	opacity: 0;
+	display: inline-block;
+	animation: FadeIn 4s linear 0s forwards;
+
+	div {		
+		animation: FadeOut 4s linear 12s forwards;
+	}
+}
+
+
+@keyframes FadeIn { 
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 0.8;
+		color:#fff;
+	}
+}
+
+@keyframes FadeOut { 
+	0% {
+		opacity: 0.8;
+		color:#fff;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+.image {
+	position:absolute; 
+	z-index: 100; 
+	top:0;
+	vertical-align:middle;
+	text-align: center;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "medela-theme",
+  "private": true,
+  "dependencies": {
+    "gridster": "gridster-js#^0.7.0",
+    "handlebars": "~4.0.5",
+    "jquery.panzoom": "^2.0.6"
+  }
+}

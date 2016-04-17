@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Widget hinzufügen</title>
+	<link rel="stylesheet" href="./css/styles.css">
+  <script>window.$ = window.jQuery = require('./js/jquery.js');</script>
+  <script src="./js/vendor.js"></script> 
+  <script src="./js/all.js"></script> 
+  <style type="text/css">
+  select {
+    padding:5px;
+    margin-bottom:10px;
+  }
+
+  label {
+    width:150px;
+    display: inline-block;
+  }
+
+  button,
+  input {
+    width:50%;
+    margin-bottom: 5px;
+    padding:4px;
+  }
+
+  button.openFile {
+    width:auto;
+    margin-left:5px;
+  }
+
+  label ~ button {
+    margin-left:154px;
+    margin-top:5px;
+    
+  }
+  </style>
+
+  </head>
+  <body>
+
+  <select name="widget">
+  	<option value="widget-image">Bild</option>
+  	<option value="widget-dice">Würfel</option>
+    <option value="widget-message">Message</option>
+  	<option value="widget-document">Dokument</option>
+  	<option value="widget-randomlist">Zufallsliste</option>
+  	<option value="widget-randompersonen">Zufallsliste Personen</option>
+  	<option value="widget-critical">Critical</option>
+  </select>
+
+  <div class="add-widget-image">  	
+  	<form data-id="widget-image">
+  		<label>Bilddatei:</label> <input type="text" name="path"><button class="openFile" type="button">Datei wählen</button><br>
+  		<button class="add" type="button">hinzufügen</button>
+  	</form>
+  </div>
+
+  <div class="add-widget-dice" style="display: none">
+  	<form data-id="widget-dice">
+  		<button class="add" type="button">hinzufügen</button>
+  	</form>
+  </div>
+
+  <div class="add-widget-message" style="display: none">
+    <form data-id="widget-message">
+      <button class="add" type="button">hinzufügen</button>
+    </form>
+  </div>
+
+
+  <div class="add-widget-document" style="display: none">
+  	<form data-id="widget-document">
+  		<label>Dokument:</label> <input type="text" name="path"><button class="openFile" type="button">Datei wählen</button><br>
+  		<label>Bilddatei:</label> <input type="text" name="imgpath"><button class="openFile" type="button">Datei wählen</button><br>
+  		<button class="add" type="button">hinzufügen</button>
+  	</form>
+  </div>
+
+  <div class="add-widget-randomlist" style="display: none">
+  	<form data-id="widget-randomlist">
+  		<label>Name:</label> <input type="text" name="name"><br>
+  		<label>Zufallsliste:</label> <input type="text" name="path"><button class="openFile" type="button">Datei wählen</button><br>
+  		<button class="add" type="button">hinzufügen</button>
+  	</form>
+  </div>
+
+  <div class="add-widget-randompersonen" style="display: none">
+  	<form data-id="widget-randompersonen">
+      <label>Name:</label> <input type="text" name="name"><br>
+  		<label>Vornamen Weiblich:</label> <input type="text" name="firstnamewrandomlist"><button class="openFile" type="button">Datei wählen</button><br>
+  		<label>Vornamen Männlich:</label> <input type="text" name="firstnamemrandomlist"><button class="openFile" type="button">Datei wählen</button><br>
+  		<label>Nachnamen:</label> <input type="text" name="lastnamerandomlist"><button class="openFile" type="button">Datei wählen</button><br>
+  		<button class="add" type="button">hinzufügen</button>
+  	</form>
+  </div>
+
+  <div class="add-widget-critical" style="display: none">
+  	<form data-id="widget-critical">
+	  	<label>Kritischer Erfolg Angriff:</label> <input type="text" name="patherfolgabwehr"><button class="openFile" type="button">Datei wählen</button><br>
+  		<label>Kritischer Erfolg Abwehr:</label> <input type="text" name="patherfolgschaden"><button class="openFile" type="button">Datei wählen</button><br>
+  		<label>Kritischer Misserfolg Angriff:</label> <input type="text" name="pathmisserfolgabwehr"><button class="openFile" type="button">Datei wählen</button><br>
+  		<label>Kritischer Misserfolg Abwehr:</label> <input type="text" name="pathmisserfolgschaden"><button class="openFile" type="button">Datei wählen</button><br>
+		  <button class="add" type="button">hinzufügen</button>
+    </form>
+  </div>
+
+  </body>
+</html>

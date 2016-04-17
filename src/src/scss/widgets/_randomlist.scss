@@ -1,0 +1,22 @@
+.widget-randomlist,
+.widget-randompersonen {
+	button {
+		width:100%;
+		padding:4px;
+		margin-bottom: 10px;
+	}
+
+	.result {
+		text-align: left;		
+	}
+
+	.resultw,
+	.resultm {
+		width:50%;
+		float:left;
+
+		span {
+			float:left;
+		}
+	}
+}
