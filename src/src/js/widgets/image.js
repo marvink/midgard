@@ -5,8 +5,11 @@ $(function(){
 
 	$('body').on('click', '.widget-image img', function(e) {
 		var path = $(this).attr('src');
-
-		tab = addTab("Image");
+		if ($(this).parents('li').data("name") != "") {
+			tab = addTab($(this).parents('li').data("name"));
+		} else {
+			tab = addTab($(this).parents('li').data("Bild"));
+		}
 		tab.addClass("imageTab");
 
 		ipcRenderer.send("image-message", path);
@@ -64,7 +67,6 @@ $(function(){
         $('.imageTab .overflow').width(arg.width).height(arg.height);
 
         $panzoom.panzoom('reset');
-  		$panzoom.panzoom('resetDimensions');
-  		
+  		$panzoom.panzoom('resetDimensions');  		
     }); 
 });

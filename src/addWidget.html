@@ -43,6 +43,8 @@
   <select name="widget">
   	<option value="widget-image">Bild</option>
   	<option value="widget-dice">Würfel</option>
+    <option value="widget-calendar">Kalender</option>
+    <option value="widget-weather">Wetter</option>
     <option value="widget-message">Message</option>
   	<option value="widget-document">Dokument</option>
   	<option value="widget-randomlist">Zufallsliste</option>
@@ -52,6 +54,7 @@
 
   <div class="add-widget-image">  	
   	<form data-id="widget-image">
+      <label>Name:</label> <input type="text" name="name"><br>
   		<label>Bilddatei:</label> <input type="text" name="path"><button class="openFile" type="button">Datei wählen</button><br>
   		<button class="add" type="button">hinzufügen</button>
   	</form>
@@ -61,6 +64,71 @@
   	<form data-id="widget-dice">
   		<button class="add" type="button">hinzufügen</button>
   	</form>
+  </div>
+
+  <div class="add-widget-calendar" style="display: none">
+    <form data-id="widget-calendar">
+      <select name="day">
+          <option value="1">01</option> 
+          <option value="2">02</option> 
+          <option value="3">03</option> 
+          <option value="4">04</option> 
+          <option value="5">05</option> 
+          <option value="6">06</option> 
+          <option value="7">07</option> 
+          <option value="8">08</option> 
+          <option value="9">09</option> 
+          <option value="10">10</option> 
+          <option value="11">11</option> 
+          <option value="12">12</option> 
+          <option value="13">13</option> 
+          <option value="14">14</option> 
+          <option value="15">15</option> 
+          <option value="16">16</option> 
+          <option value="17">17</option> 
+          <option value="18">18</option> 
+          <option value="19">19</option> 
+          <option value="20">20</option> 
+          <option value="21">21</option> 
+          <option value="22">22</option> 
+          <option value="23">23</option> 
+          <option value="24">24</option> 
+          <option value="25">25</option> 
+          <option value="26">26</option>
+        </optgroup>
+      </select>
+      <select name="moon">
+        <optgroup label="Frühjahr">
+          <option value="Bärenmond">Bärenmond</option>  
+          <option value="Luchsmond">Luchsmond</option>  
+          <option value="Einhornmond">Einhornmond</option>  
+        </optgroup>
+        <optgroup label="Sommer">
+          <option value="Nixenmond">Nixenmond</option>  
+          <option value="Schlangenmond">Schlangenmond</option>  
+          <option value="Feenmond">Feenmond</option>
+        </optgroup>
+        <optgroup label="Herbst">
+          <option value="Hirschmond">Hirschmond</option>  
+          <option value="Drachenmond">Drachenmond</option>  
+          <option value="Kranichmond">Kranichmond</option>
+        </optgroup>
+        <optgroup label="Winter">
+          <option value="Rabenmond">Rabenmond</option>  
+          <option value="Trollmond">Trollmond</option>  
+          <option value="Draugmond">Draugmond</option>
+          <option value="Wolfmond">Wolfmond</option>
+        </optgroup>        
+      </select>
+      <input name="year" value="2424" /> 2016 = 2426
+      <button class="add" type="button">hinzufügen</button>
+    </form>
+  </div>
+
+  <div class="add-widget-weather" style="display: none">
+    <form data-id="widget-weather">
+      <button class="add" type="button">hinzufügen</button>
+    </form>
   </div>
 
   <div class="add-widget-message" style="display: none">
@@ -98,8 +166,8 @@
 
   <div class="add-widget-critical" style="display: none">
   	<form data-id="widget-critical">
-	  	<label>Kritischer Erfolg Angriff:</label> <input type="text" name="patherfolgabwehr"><button class="openFile" type="button">Datei wählen</button><br>
-  		<label>Kritischer Erfolg Abwehr:</label> <input type="text" name="patherfolgschaden"><button class="openFile" type="button">Datei wählen</button><br>
+	  	<label>Kritischer Erfolg Angriff:</label> <input type="text" name="patherfolgschaden"><button class="openFile" type="button">Datei wählen</button><br>
+  		<label>Kritischer Erfolg Abwehr:</label> <input type="text" name="patherfolgabwehr"><button class="openFile" type="button">Datei wählen</button><br>
   		<label>Kritischer Misserfolg Angriff:</label> <input type="text" name="pathmisserfolgabwehr"><button class="openFile" type="button">Datei wählen</button><br>
   		<label>Kritischer Misserfolg Abwehr:</label> <input type="text" name="pathmisserfolgschaden"><button class="openFile" type="button">Datei wählen</button><br>
 		  <button class="add" type="button">hinzufügen</button>

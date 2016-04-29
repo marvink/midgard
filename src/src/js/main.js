@@ -15,11 +15,9 @@ $(function(){ //DOM Ready
         min_cols: 10,
         min_rows: 10,
         serialize_params: function ($w, wgd) {
-        	console.log($w);
         	var id = $w.find("> div").attr("class");
         	var d = {}, 
 	        re_dataAttr = /^data\-(.+)$/;
-
 		    $.each($w.get(0).attributes, function(index, attr) {
 		        if (re_dataAttr.test(attr.nodeName)) {
 		            var key = attr.nodeName.match(re_dataAttr)[1];
@@ -90,7 +88,7 @@ $(function(){ //DOM Ready
 	$('button.add').click(function() {
 		var id = $(this).parent('form').data('id');
 		var args = {}
-		$(this).parent('form').find('input').each(function() {
+		$(this).parent('form').find('input,select').each(function() {
 			args[$(this).attr('name')] = $(this).val();
 		});
 
@@ -165,6 +163,7 @@ function addTab(name) {
 }
 
 function removeTab(id) {
+	ipcRenderer.send("toggle-image", "none");
 	$('.etabs').find('a[href="#dashboard"]').trigger('click');	
 	$('.etabs').find('a[href="'+id+'"]').parent('li').remove();
 	$(id).remove();

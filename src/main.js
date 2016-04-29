@@ -134,12 +134,15 @@ ipcMain.on('addWidgetToMainWindow', function(event, arg) {
 
 ipcMain.on('image-message', function(event, arg) {
   createSecondWindow(function() {
+    mainWindow.webContents.send('viewport-change', secondWindow.getBounds()) 
     secondWindow.webContents.send('image-reply', arg)
   });
 });
 
 ipcMain.on('toggle-image', function(event, arg) {
-    secondWindow.webContents.send('toggle-image-reply', arg)
+    createSecondWindow(function() {
+      secondWindow.webContents.send('toggle-image-reply', arg)
+    });
 });
 
 ipcMain.on('image-change', function(event, arg) {

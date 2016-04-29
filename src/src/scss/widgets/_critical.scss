@@ -3,6 +3,11 @@
 		width:100%;
 		margin-bottom: 5px;
 		padding:4px;
+		cursor: pointer;
+	}
+
+	strong {
+		font-weight: bold;
 	}
 
 	span {
@@ -32,6 +37,12 @@
 	.auswirkung {
 		font-weight: bold;
 		width:50%;
+	}
+
+	.description,
+	.description2,
+	.description3 {
+		margin-bottom: 20px;
 	}
 
 	.description {

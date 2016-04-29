@@ -1,0 +1,18 @@
+.widget-calendar {
+	button {
+		width: 49%;
+		float:left;
+		display: block;
+		margin-top: 5px;
+		padding:4px;
+		cursor: pointer;
+
+		&.minus {			
+			margin-right: 1%
+		}
+
+		&.show {
+			width: 100%;
+		}
+	}
+}
