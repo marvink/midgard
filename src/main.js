@@ -56,14 +56,25 @@ const BrowserWindow = electron.BrowserWindow;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let selectWindow;
 let secondWindow;
-let addWidgetWindow;
+let settingsWindow;
 
-function createWindow () {
-	
+function createSelectWindow () {
+  
   
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600});
+  selectWindow = new BrowserWindow({width: 400, height: 400, autoHideMenuBar: true});
+  //selectWindow.webContents.openDevTools();
+  
+  // and load the index.html of the app.
+  selectWindow.loadURL('file://' + __dirname + '/select.html');
+}
+
+function createWindow () {
+  
+  // Create the browser window.
+  mainWindow = new BrowserWindow({width: 800, height: 600, autoHideMenuBar: true, frame: false});
   
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/dashboard.html');
@@ -71,12 +82,18 @@ function createWindow () {
   // Open the DevTools.
   mainWindow.maximize();
   //mainWindow.webContents.openDevTools();
-  
+
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
     if (secondWindow != undefined) {
       secondWindow.close();
+    }
+    if (addWidgetWindow != undefined) {
+      addWidgetWindow.close();
+    }    
+    if (settingsWindow != undefined) {
+      settingsWindow.close();
     }
     mainWindow = null;
   });
@@ -91,6 +108,8 @@ function createSecondWindow(callback) {
       secondWindow = null;
     });
 
+    
+  //secondWindow.webContents.openDevTools();
     mainWindow.webContents.send('viewport-change', secondWindow.getBounds())  
 
     secondWindow.webContents.on('did-finish-load', function() {
@@ -105,31 +124,19 @@ function createSecondWindow(callback) {
   }
 }
 
-function createAddWidgetWindow() {
-    addWidgetWindow = new BrowserWindow({width: 800, height: 600, resizable: true, autoHideMenuBar: false});
-    addWidgetWindow.loadURL('file://' + __dirname + '/addWidget.html');
-
-    addWidgetWindow.on('closed', function() {
-      addWidgetWindow = null;
-    });  
-}
+ipcMain.on('openMainWindow', function(event, arg) {
+  createWindow(function() {});
+});
 
 ipcMain.on('openSecondWindow', function(event, arg) {
   createSecondWindow(function() {});
 });
 
-ipcMain.on('openAddWidgetWindow', function(event, arg) {
-  createAddWidgetWindow();
-});
-
 ipcMain.on('asynchronous-message', function(event, arg) {
   createSecondWindow(function() {
+    secondWindow.webContents.send('toggle-image-reply', {"display": "none"})
     secondWindow.webContents.send('asynchronous-reply', arg)  
   });
-});
-
-ipcMain.on('addWidgetToMainWindow', function(event, arg) {
-  mainWindow.webContents.send('addWidgetToMainWindow-reply', arg)  
 });
 
 ipcMain.on('image-message', function(event, arg) {
@@ -146,17 +153,13 @@ ipcMain.on('toggle-image', function(event, arg) {
 });
 
 ipcMain.on('image-change', function(event, arg) {
-  if (event.sender.getId() == 6) {
-      mainWindow.webContents.send('image-change-reply', arg)
-  } else {
     createSecondWindow(function() {
       secondWindow.webContents.send('image-change-reply', arg)
-    });  
-  }  
+    });    
 });
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', createWindow);
+app.on('ready', createSelectWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

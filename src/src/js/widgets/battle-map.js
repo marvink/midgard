@@ -1,5 +1,5 @@
 // var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+/*var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
 
@@ -171,4 +171,4 @@ function createTileSelector() {
     marker.lineStyle(2, 0x000000, 1);
     marker.drawRect(0, 0, 32, 32);
 
-}
+}*/

@@ -2,10 +2,13 @@ const fs = require('fs');
 const shell = require('electron').shell;
 const ipcMain = require('electron').ipcMain;
 const ipcRenderer = require('electron').ipcRenderer;
+const dialog = require('electron').remote.dialog;
 const remote = require('electron').remote;
 const app = remote.app;
-const dialog = remote.require('dialog');
+const path = require('path')
 
+const ElectronSettings = require('electron-settings');
+let settings = new ElectronSettings();
 
 $(function(){ //DOM Ready
 
@@ -35,7 +38,7 @@ $(function(){ //DOM Ready
 		    };
 		},
 		draggable: {
-			enabled: true,
+			enabled: false,
 			stop: function(e, ui, $widget) {
 				saveGrid();
 			}
@@ -46,15 +49,26 @@ $(function(){ //DOM Ready
 				saveGrid();
 			}
 		}
-    }).data('gridster');
+    }).data('gridster').disable();
+
+    $('body').on('click', 'button.gridMove', function() {
+    	if ($(this).hasClass('active')) {
+    		gridster.disable();
+	    	$(this).removeClass('active');
+    	} else {
+    		gridster.enable();
+    		$(this).addClass('active');	
+    	}
+    	
+    });
 
     if (gridster != undefined) { 
     	gridster.remove_all_widgets();
     
-		fs.readFile(app.getPath('userData') + '/widgets.txt', 'utf8', function (err, data) {
+		fs.readFile(app.getPath('userData') + '/adventures/' + settings.get('currentAdventure'), 'utf8', function (err, data) {
 		    if (err) return console.log(err);
 		    json = JSON.parse(data);
-		    $.each(json, function() {
+		    $.each(json.grid, function() {
 		    	var that = this;
 
 		    	$.get("widgets/" + that.id + '.handlebars', function(response){
@@ -66,86 +80,164 @@ $(function(){ //DOM Ready
 		});
 	}
 
-	$('button.openFile').click(function() {
+	$('button.fancybox').click(function () {
+		href = $(this).data('fancybox');
+        $.fancybox([{ 
+        	'href' : href,
+            padding: 0
+            }
+        ]);
+    });
 
-		that = 	$(this);
+	$('body').on('click', 'button.openFile', function() {
 
-		dialog.showOpenDialog(function (fileNames) {
-			that.prev('input').val(fileNames);
-  		});
+		type = $(this).data('type');
+		element = $(this).prev('input');
+
+		openFile(type, element);
 	});
+
+	$('body').on('click', 'input.openFile', function() {
+
+		type = $(this).data('type');
+		element = $(this);
+
+		openFile(type, element);
+	});
+
+	function openFile(type, element) {
+
+		if (type == "directory") {
+			dialog.showOpenDialog({properties: ['openDirectory']}, function (fileNames) {
+				element.val(fileNames);
+	  		});
+		} else if (type == "images") {
+			dialog.showOpenDialog({properties: ['openFile'], filters: [{name: 'Images', extensions: ['jpg', 'png', 'gif']}] }, function (fileNames) {
+				element.val(fileNames);
+	  		});
+		} else {
+			dialog.showOpenDialog(function (fileNames) {
+				element.val(fileNames);
+	  		});
+		}		
+	}
 
 	$('body').on('click', 'header.remove-widget', function(e) {
 		removeWidget($(this).parent('li'));
 		saveGrid();
 	});
 
-	$('select[name="widget"]').change(function() {
-		$(this).parent('body').find('div').hide();
-		$(this).parent('body').find('.add-'+$(this).val()).show();
-	});
-
 	$('button.add').click(function() {
-		var id = $(this).parent('form').data('id');
-		var args = {}
-		$(this).parent('form').find('input,select').each(function() {
-			args[$(this).attr('name')] = $(this).val();
-		});
-
-		ipcRenderer.send("addWidgetToMainWindow", {'id':id,'args': args});
+		var args = {};
+		var id;
+		if ($(this).data('id') != undefined) {
+			id = $(this).data('id');
+		} else {
+			id = $(this).parents('form').data('id');			
+			$(this).parents('form').find('input,select').each(function() {
+				args[$(this).attr('name')] = $(this).val();
+			});
+		}
+		$.get("widgets/" + id + '.handlebars', function(response){
+		    var template = Handlebars.compile(response);
+	        html = template({"args": args});
+	        gridster.add_widget(html, 1, 1, 1, 1);
+	        saveGrid();
+	        $.fancybox.close();
+	    });
 	});
 
-	$('.etabs').each(function(){
+	$('.tab-group').each(function(){
 	    // For each set of tabs, we want to keep track of
 	    // which tab is active and its associated content
-	    var $active, $content, $links = $(this).find('a');
+	    var $active, $content, $links = $(this).find('div');
 
 	    // If the location.hash matches one of the links, use that as the active tab.
 	    // If no match is found, use the first link as the initial active tab.
-	    $active = $($links.filter('[href="'+location.hash+'"]')[0] || $links[0]);
-	    $active.parent('.tab').addClass('active');
-
-	    $content = $($active[0].hash);
-
+	    $active = $($links.filter('[data-href="'+location.hash+'"]')[0] || $links[0]);
+	    $active.addClass('active');
+	    $content = $($active).data('href');
+	    
 	    // Hide the remaining content
 	    $links.not($active).each(function () {
-	      $(this.hash).hide();
+	      $($(this).data('href')).hide();
 	    });
 
 	    // Bind the click event handler
-	    $(this).on('click', 'a', function(e){
+	    $(this).on('click', '.tab-item', function(e){
 	      // Make the old tab inactive.
-	      $active.parent('.tab').removeClass('active');
-	      $content.hide();
+	      $active.removeClass('active');
+	      $($content).hide();
 
 	      // Update the variables with the new link and content
 	      $active = $(this);
-	      $content = $(this.hash);
+	      $content = $(this).data('href');
 
 	      // Make the tab active.
-	      $active.parent('.tab').addClass('active');
-	      $content.show();
+	      $active.addClass('active');
+	      $($content).show();
 
 	      // Prevent the anchor's default click action
 	      e.preventDefault();
 	    });
 
-	     // Bind the click event handler
-	    $(this).on('click', '.vorschau', function(e){
-	      ipcRenderer.send("openSecondWindow");
-	    });
-
-	    $(this).on('click', '.addWidget', function(e){
-	      ipcRenderer.send("openAddWidgetWindow");
-	    });
 	});
+
+	// SETTINGS
+
+	navigator.mediaDevices.enumerateDevices().then(function(devices) {
+	  devices.forEach(function(device) {
+	  	if (device.kind == "audiooutput") {
+	  		if (settings.get('sounddevice') == device.deviceId) {
+	  			$('.sounddevices').append($('<option selected="selected"></option>').val(device.deviceId).html(device.label));
+	  		} else {
+	  			$('.sounddevices').append($('<option></option>').val(device.deviceId).html(device.label));
+	  		}
+	  	}
+	  })
+	});
+
+	$('body').on('change', '.sounddevices', function(e) {
+		settings.set('sounddevice', $(this).val());
+	}); 
+
+    fs.readdir(app.getPath('userData') + '/adventures', function(err, files) {
+      for(var i in files) {
+
+        var filename = files[i];
+
+        file = fs.readFileSync(app.getPath('userData') + '/adventures/' + filename, 'utf8');
+
+        name = JSON.parse(file).name;
+
+        $('select[name=adventureSettings]').append('<option value='+ filename +'>'+name+'</option');
+      }     
+    });
+
+    $('body').on('click', '.adventureSettings', function(e) {
+      e.preventDefault();
+      var value = $('select[name=adventureSettings]').val();
+
+      for(var i in value) {
+        fs.unlinkSync(app.getPath('userData') + '/adventures/' + value[i])
+      }
+    });
 
 });
 
 function saveGrid() {
-	fs.writeFile(app.getPath('userData') + '/widgets.txt', JSON.stringify(gridster.serialize()), (err) => {
-	  if (err) throw err;
-	  console.log('It\'s saved!');
+
+	fs.readFile(app.getPath('userData') + '/adventures/' + settings.get('currentAdventure'), 'utf8', function (err, data) {
+	    if (err) return console.log(err);
+	    json = JSON.parse(data);
+
+	   	json.grid = gridster.serialize()
+	    
+	    fs.writeFile(app.getPath('userData') + '/adventures/' + settings.get('currentAdventure'), JSON.stringify(json), (err) => {
+		  if (err) throw err;
+		  console.log('It\'s saved!');
+		});	
+	    
 	});
 }
 
@@ -155,27 +247,16 @@ function removeWidget(widget) {
 
 function addTab(name) {
 	id = new Date().getTime();
-	$('.etabs').append("<li class='tab removable'><a href='#cont"+id+"'>"+name+"</a><span onclick='removeTab(\"#cont"+id+"\")'>x</span></li>");
+	$('.tab-group').append("<div class='tab-item removable' data-href='#cont"+id+"'>"+name+"<span onclick='removeTab(\"#cont"+id+"\")' class='icon fa-times icon-close-tab'></span></div>");
 	$('.panel-container').append("<div id='cont"+id+"'></div>");
-	$('.etabs').find('a[href="#cont'+id+'"]').trigger('click');
+	$('.tab-group').find('div[data-href="#cont'+id+'"]').trigger('click');
 
 	return $('.panel-container').find('#cont'+id); 
 }
 
 function removeTab(id) {
 	ipcRenderer.send("toggle-image", "none");
-	$('.etabs').find('a[href="#dashboard"]').trigger('click');	
-	$('.etabs').find('a[href="'+id+'"]').parent('li').remove();
+	$('.tab-group').find('div[data-href="#dashboard"]').trigger('click');	
+	$('.tab-group').find('div[data-href="'+id+'"]').remove();
 	$(id).remove();
 }
-
-ipcRenderer.on('addWidgetToMainWindow-reply', function(event, arg) {        
-	var that = arg;
-
-	$.get("widgets/" + that.id + '.handlebars', function(response){
-	    var template = Handlebars.compile(response);
-        html = template(that);
-        gridster.add_widget(html, 1, 1, 1, 1);
-        saveGrid();
-    });
-}); 

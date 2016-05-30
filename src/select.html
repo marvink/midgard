@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>It's Adventuretime!</title>
+	<link rel="stylesheet" href="./css/select.css">
+  <script>window.$ = window.jQuery = require('./js/jquery.js');</script>
+  <script type="text/javascript">
+		const fs = require('fs');
+		const shell = require('electron').shell;
+		const ipcMain = require('electron').ipcMain;
+		const ipcRenderer = require('electron').ipcRenderer;
+		const dialog = require('electron').remote.dialog;
+		const remote = require('electron').remote;
+		const app = remote.app;
+		const ElectronSettings = require('electron-settings');
+		let settings = new ElectronSettings();
+
+		$(function(){ //DOM Ready
+			fs.access(app.getPath('userData') + '/adventures', fs.R_OK | fs.W_OK, (err) => {				
+				if (err) {
+					fs.mkdir(app.getPath('userData') + "/adventures")
+				}
+			});
+
+			fs.access(app.getPath('userData') + '/widgets.txt', fs.R_OK | fs.W_OK, (err) => {
+				if (!err) {		
+					fs.rename(app.getPath('userData') + "/widgets.txt", app.getPath('userData') + "/adventures/widgets.txt");
+
+					fs.readFile(app.getPath('userData') + '/adventures/widgets.txt', 'utf8', function (err, data) {
+					    if (err) return console.log(err);
+					    json = JSON.parse(data);
+
+					    var newjson = {
+					    	name: "default",
+					    	grid : json
+					    }
+					    
+					    fs.writeFile(app.getPath('userData') + '/adventures/widgets.txt', JSON.stringify(newjson), (err) => {
+						  if (err) throw err;
+						  console.log('It\'s saved!');
+						});	
+					    
+					});
+					  
+				}
+			});
+
+    		fs.readdir(app.getPath('userData') + '/adventures', function(err, files) {
+				for(var i in files) {
+
+					var filename = files[i];
+
+					file = fs.readFileSync(app.getPath('userData') + '/adventures/' + filename, 'utf8');
+
+					name = JSON.parse(file).name;
+
+					$('.adventureSettings select').append('<option value='+ filename +'>'+name+'</option>');
+				}			
+			});
+
+			$('.addAdventure').click(function() {
+				var value = $('input[name=newAdventure]').val();
+
+				var filename = value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+				settings.set('currentAdventure', filename);
+
+				var newjson = {
+			    	name: value,
+			    	grid : []
+			    }
+
+				fs.writeFile(app.getPath('userData') + '/adventures/'+filename, JSON.stringify(newjson), (err) => {
+				  if (err) throw err;
+				  console.log('It\'s saved!');
+				});	
+
+				ipcRenderer.send("openMainWindow");
+			});
+
+			$('.chooseAdventure').click(function() {
+				var value = $('select[name=chooseAdventure]').val();
+
+				settings.set('currentAdventure', value);
+
+				ipcRenderer.send("openMainWindow");
+
+				//remote.getCurrentWindow().close();
+			});
+    	});
+  </script>
+  </head>
+  <body>
+  	<div class="adventureSettings">
+  		Abenteuer Auswählen:<br>
+	  	<select name="chooseAdventure">
+	  		
+	  	</select>
+	  	<button class="chooseAdventure">Auswählen</button>
+		<br><br>
+	  	Neues Abenteuer:<br>
+	  	<input type="text" name="newAdventure">
+	  	<button class="addAdventure">hinzufügen</button>
+  	</div>
+
+  </body>
+</html>

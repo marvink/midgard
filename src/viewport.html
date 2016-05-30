@@ -8,45 +8,31 @@
     <script src="./js/jquery.lettering.js"></script> 
     <script src="./js/fittext.js"></script> 
 
-
     <script>
       const ipcRenderer = require('electron').ipcRenderer;
       var $panzoom
 
       ipcRenderer.on('asynchronous-reply', function(event, arg) {        
-        $('.message').html("<h2><div>"+arg+"</div></h2>");
+        $('.message').html("<h2><div>"+arg+"</div></h2>");        
       }); 
 
       ipcRenderer.on('image-reply', function(event, arg) {
-        console.log(arg)
-        $('.image').html('<div class="overflow" style="width:100vw; height:100vh;"><div class="panzoom"><img style="display:none" src="'+arg+'"/></div>');
+
+        loadCanvas($('.image').find('canvas')[0],arg);
+        $('.image').find('canvas').attr("data-path", arg);
 
         $panzoom = $('.panzoom').panzoom();
-    
-        $panzoom.parent().on('mousewheel.focal', function( e ) {
-          e.preventDefault();
-          var delta = e.delta || e.originalEvent.wheelDelta;
-          var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
-          $panzoom.panzoom('zoom', zoomOut, {
-            increment: 0.1,
-            animate: false,
-            focal: e
-          });
-        });
-
-        $panzoom.on('panzoomchange', function(e, panzoom, transform) {
-          ipcRenderer.send("image-change", transform);
-        });
       }); 
 
       ipcRenderer.on('image-change-reply', function(event, arg) {        
-        $panzoom.off('panzoomchange');
+        //$panzoom.off('panzoomchange');
+        console.log("change")
         
         $panzoom.panzoom("setMatrix", arg);
 
-        $panzoom.on('panzoomchange', function(e, panzoom, transform) {
+      /*  $panzoom.on('panzoomchange', function(e, panzoom, transform) {
           ipcRenderer.send("image-change", transform);
-        });
+        }); */
       }); 
 
       ipcRenderer.on('viewport-change', function(event, arg) {
@@ -55,8 +41,28 @@
       }); 
 
       ipcRenderer.on('toggle-image-reply', function(event, arg) {
-        $('.image').find('img').css('display',arg);
-      }); 
+        var oldPath = $('.image').find('canvas').attr("data-path");
+        if (oldPath != arg.path) {
+          $('.image').find('canvas').attr("data-path", arg.path);
+          loadCanvas($('.image').find('canvas')[0], arg.path);
+          $panzoom.panzoom('reset');
+          $panzoom.panzoom('resetDimensions');
+        }
+        $('.image').find('canvas').css('display',arg.display);
+      });
+
+      function loadCanvas(canvas, dataURL) {     
+        var context = canvas.getContext('2d');
+
+        // load image from data url
+        var imageObj = new Image();
+        imageObj.onload = function() {
+          $(canvas).attr("width",imageObj.naturalWidth).attr("height",imageObj.naturalHeight);
+          context.drawImage(this, 0, 0);
+        };
+
+        imageObj.src = dataURL;
+      }
     </script>
     <link rel="stylesheet" href="./css/viewport.css">
 
@@ -70,7 +76,7 @@
     </div>
 
     <div class="image">
-      
+      <div class="overflow" style="width:100vw; height:100vh;"><div class="panzoom"><canvas style="display:none"></canvas></div>
     </div>
   </body>
 </html>

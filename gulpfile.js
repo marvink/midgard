@@ -26,12 +26,12 @@ gulp.task('exe', function(done) {
 
 
   winInstaller({
-    appDirectory: './build/v0.37.6/win32-ia32',
+    appDirectory: './build/v1.2.0/win32-ia32',
     outputDirectory: './release',
     arch: 'ia32',    
     authors: 'Marvin Kerkhoff',
-    version: '0.1.0',
     noMsi: false,
+    version: "0.2.0",
     setupExe: 'Midgard-Setup.exe',
     iconUrl: 'http://midgard-online.de/favicon-midgard-online.ico'
   }).then(done).catch(done);
@@ -46,7 +46,7 @@ gulp.task('build', function() {
         packageJson: packageJson,
         release: './build',
         cache: './cache',
-        version: 'v0.37.6',
+        version: 'v1.2.0',
         packaging: true,
         platforms: ['win32-ia32'],
         platformResources: {            

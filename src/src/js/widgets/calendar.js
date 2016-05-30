@@ -8,9 +8,9 @@ $(function(){
 		var moonIndex = moons.indexOf($(this).parents('li').data('moon'));
 		console.log(moonIndex)
 		if(day == "0") {
-			$(this).parents('li').data('day', 26);
-			$(this).parents('li').attr('data-day', 26);
-			$(this).parents('li').find('.day').html(26);
+			$(this).parents('li').data('day', 28);
+			$(this).parents('li').attr('data-day', 28);
+			$(this).parents('li').find('.day').html(28);
 			if ((moonIndex - 1) <= 0) {
 				$(this).parents('li').data('moon', moons[12]);
 				$(this).parents('li').attr('data-moon', moons[12]);
@@ -35,7 +35,7 @@ $(function(){
 		var day = $(this).parents('li').data('day') + 1;
 		var moonIndex = moons.indexOf($(this).parents('li').data('moon'));
 
-		if(day == "27") {
+		if(day == "28") {
 			$(this).parents('li').data('day', 1);
 			$(this).parents('li').attr('data-day', 1);
 			$(this).parents('li').find('.day').html(1);
@@ -64,14 +64,26 @@ $(function(){
 		var day = $(this).parents('li').data('day');
 		var moon = $(this).parents('li').data('moon');
 		var year = $(this).parents('li').data('year');
+		var moonIndex = moons.indexOf(moon);
 
 		var sounds = [ "sounds/majorasmask_newday.wav", "sounds/Hahn2.mp3", "sounds/Hahn_kraeht.mp3" ]
 
 		random = Math.floor(Math.random()*sounds.length)
 
 		var typeWriter = new Audio(sounds[random]);
-		typeWriter.play()
+		typeWriter.setSinkId(settings.get('sounddevice'));		
+		typeWriter.play();
 
-		ipcRenderer.send("asynchronous-message", day+". "+moon+" "+year+"nL");	
+		var jahreszeit = "(Winter)";
+		if (moonIndex >= 2 && moonIndex < 5) {
+			jahreszeit = "(Frühling)";
+		}		
+		if (moonIndex >= 5 && moonIndex < 7) {
+			jahreszeit = "(Sommer)";
+		}
+		if (moonIndex >= 7 && moonIndex < 10) {
+			jahreszeit = "(Herbst)";
+		}
+		ipcRenderer.send("asynchronous-message", day+". "+moon+" "+year+"nL <br>"+jahreszeit );
 	});
 });

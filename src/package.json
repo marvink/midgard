@@ -1,6 +1,6 @@
 {
   "name"    : "midgard-dashboard",
-  "version" : "0.1.0",
+  "version" : "0.2.0",
   "main"    : "main.js",
   "description": "A minimal Electron application",
   "scripts": {
@@ -17,12 +17,8 @@
     "tutorial"
   ],
   "author": "GitHub",
-  "license": "CC0-1.0",
-  "bugs": {
-    "url": "https://github.com/atom/electron-quick-start/issues"
-  },
-  "homepage": "https://github.com/atom/electron-quick-start#readme",
-  "devDependencies": {
-    "electron-prebuilt": "^0.36.0"
+  "license": "CC0-1.0",  
+  "dependencies": {
+    "electron-settings": "^1.0.4"
   }
 }
