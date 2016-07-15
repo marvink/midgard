@@ -81,7 +81,7 @@ function createWindow () {
   
   // Open the DevTools.
   mainWindow.maximize();
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
 
   // Emitted when the window is closed.
@@ -109,7 +109,7 @@ function createSecondWindow(callback) {
     });
 
     
-  //secondWindow.webContents.openDevTools();
+  secondWindow.webContents.openDevTools();
     mainWindow.webContents.send('viewport-change', secondWindow.getBounds())  
 
     secondWindow.webContents.on('did-finish-load', function() {
@@ -155,6 +155,12 @@ ipcMain.on('toggle-image', function(event, arg) {
 ipcMain.on('image-change', function(event, arg) {
     createSecondWindow(function() {
       secondWindow.webContents.send('image-change-reply', arg)
+    });    
+});
+
+ipcMain.on('fogOfWar-change', function(event, arg) {
+    createSecondWindow(function() {
+      secondWindow.webContents.send('fogOfWar-change-reply', arg)
     });    
 });
 // This method will be called when Electron has finished

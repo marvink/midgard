@@ -65,4 +65,16 @@ body {
 	top:0;
 	vertical-align:middle;
 	text-align: center;
+
+	.imageCanvas {
+		position:absolute;
+		z-index:1;
+	}
+
+	.fogOfWarCanvas {
+		position:absolute;
+		z-index:10;
+		right:0px;
+		left:0px;
+	}
 }

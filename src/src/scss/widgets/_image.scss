@@ -13,4 +13,14 @@
 	.overflow {
 		border:1px solid #000;
 	}
+
+	.imageCanvas {
+		position:absolute;
+		z-index:1;
+	}
+
+	.fogOfWarCanvas {
+		position:absolute;
+		z-index:10;
+	}
 }

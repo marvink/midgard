@@ -18,8 +18,8 @@
 
       ipcRenderer.on('image-reply', function(event, arg) {
 
-        loadCanvas($('.image').find('canvas')[0],arg);
-        $('.image').find('canvas').attr("data-path", arg);
+        loadCanvas($('.image').find('.imageCanvas')[0],arg);
+        $('.image').find('.imageCanvas').attr("data-path", arg);
 
         $panzoom = $('.panzoom').panzoom();
       }); 
@@ -40,15 +40,23 @@
         $panzoom.panzoom('resetDimensions');        
       }); 
 
+      ipcRenderer.on('fogOfWar-change-reply', function(event, arg) {
+        var context = $('.image').find('.fogOfWarCanvas')[0].getContext('2d');
+        context.fillStyle = "black";
+        context.clearRect(0, 0, arg.width, arg.height);
+        context.fillRect(0, 0, arg.width, arg.height);   
+      }); 
+
       ipcRenderer.on('toggle-image-reply', function(event, arg) {
-        var oldPath = $('.image').find('canvas').attr("data-path");
+        var oldPath = $('.image').find('.imageCanvas').attr("data-path");
         if (oldPath != arg.path) {
-          $('.image').find('canvas').attr("data-path", arg.path);
-          loadCanvas($('.image').find('canvas')[0], arg.path);
+          $('.image').find('.imageCanvas').attr("data-path", arg.path);
+          loadCanvas($('.image').find('.imageCanvas')[0], arg.path);
           $panzoom.panzoom('reset');
           $panzoom.panzoom('resetDimensions');
         }
-        $('.image').find('canvas').css('display',arg.display);
+        $('.image').find('.imageCanvas').css('display',arg.display);
+        $('.image').find('.fogOfWarCanvas').css('display',arg.display);
       });
 
       function loadCanvas(canvas, dataURL) {     
@@ -58,6 +66,7 @@
         var imageObj = new Image();
         imageObj.onload = function() {
           $(canvas).attr("width",imageObj.naturalWidth).attr("height",imageObj.naturalHeight);
+          $('.image').find('.fogOfWarCanvas').attr("width",imageObj.naturalWidth).attr("height",imageObj.naturalHeight);
           context.drawImage(this, 0, 0);
         };
 
@@ -76,7 +85,7 @@
     </div>
 
     <div class="image">
-      <div class="overflow" style="width:100vw; height:100vh;"><div class="panzoom"><canvas style="display:none"></canvas></div>
+      <div class="overflow" style="width:100vw; height:100vh;"><div class="panzoom"><canvas class="imageCanvas" style="display:none"></canvas><canvas class="fogOfWarCanvas" style="display:none"></canvas></div>
     </div>
   </body>
 </html>

@@ -35,7 +35,7 @@ $(function(){
 		var day = $(this).parents('li').data('day') + 1;
 		var moonIndex = moons.indexOf($(this).parents('li').data('moon'));
 
-		if(day == "28") {
+		if(day == "29") {
 			$(this).parents('li').data('day', 1);
 			$(this).parents('li').attr('data-day', 1);
 			$(this).parents('li').find('.day').html(1);
