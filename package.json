@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "electron-settings": "^1.0.4",
-    "gulp-run": "^1.6.12"
+    "gulp-run": "^1.6.12",
+    "xlsx": "^0.8.0"
   }
 }

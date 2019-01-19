@@ -2,8 +2,12 @@
 $(function(){
 
 	var $panzoom;
+	var activeRightMouse = false;
 	var activeEraser = false;
-	var activeDrawer = true;
+	var activeDrawer = false;
+	var activeFogOfWar = false;
+	var topMargin = 62;
+    var radius = 20; 
 
 	$('body').on('click', '.widget-image img', function(e) {
 		var path = $(this).attr('src');
@@ -14,9 +18,9 @@ $(function(){
 		}
 		tab.addClass("imageTab");
 		ipcRenderer.send("image-message", path);
-		tab.append('<div class="btn-toolbar"><div class="btn-group"><button class="showImage btn btn-mini btn-default"><span title="Anzeigen" class="icon fa-eye"></span></button><button class="hideImage btn btn-mini btn-default"><span title="Verbergen" class="icon fa-low-vision"></span></button><button class="fogOfWar btn btn-mini btn-default"><span title="Fog of war" class="icon fa-cloud"></span></button><button class="removePaint btn btn-mini btn-default"><span title="Radierer" class="icon fa-pencil"></span></button></div></div></div>');
+		tab.append('<div class="btn-toolbar"><div class="btn-group"><button class="showImage btn btn-mini btn-default"><span title="Anzeigen" class="icon fa-eye"></span></button><button class="hideImage btn btn-mini btn-default"><span title="Verbergen" class="icon fa-low-vision"></span></button><button class="fogOfWar btn btn-mini btn-default"><span title="Fog of war" class="icon fa-cloud"></span></button><button class="removePaint btn btn-mini btn-default"><span title="Radierer" class="icon fa-eraser"></span></button><label for="radius">Radius:</label><input type="number" value="40" min="0" step="20" name="radius"></div></div></div>');
 
-		tab.append('<div class="overflow"><div class="panzoom"><canvas class="imageCanvas"></canvas><canvas class="fogOfWarCanvas"></canvas></div></div>');
+		tab.append('<div class="overflow"><div class="panzoom"><canvas class="imageCanvas"></canvas><canvas class="fogOfWarCanvas"></canvas></div></div><div id="radiusCursor"></div>');
 
 		loadCanvas(tab.find('.imageCanvas')[0], path);
 		tab.find('.imageCanvas').attr("data-path", path);
@@ -34,51 +38,56 @@ $(function(){
 	        });
 	    });
 
-	    $('body').on('click', '.fogOfWar', function(e) {
-	    	var context = tab.find('.fogOfWarCanvas')[0].getContext('2d');
-			context.fillStyle = "rgba(255,0,0,0.5)";
-			context.clearRect(0, 0, tab.find('.imageCanvas').data("width"), tab.find('.imageCanvas').data("height"));
-	    	context.fillRect(0, 0, tab.find('.imageCanvas').data("width"), tab.find('.imageCanvas').data("height"));
-	    	ipcRenderer.send("fogOfWar-change", {"width": tab.find('.imageCanvas').data("width"), "height": tab.find('.imageCanvas').data("height")});
-	    });
-
-	    $('body').on('click', '.removePaint', function(e) {
-
-	    	activeEraser = true;
-
-	    	var context = tab.find('.fogOfWarCanvas')[0].getContext('2d');
-			context.fillStyle = "red";
-	    	context.clearRect(e.clientX-20, e.clientY-20, 40, 40);
-	    });
 
 	    tab.find('.fogOfWarCanvas')[0].onmousemove = function(e) {
-            if (!activeEraser) {
+
+	    	if (activeEraser) {
+	    		extRadius = radius * parseFloat($panzoom.panzoom("getMatrix")[0])
+
+				$('#radiusCursor').css('left', e.clientX - extRadius/2).css('top', e.clientY - extRadius/2).css('width', extRadius ).css('height', extRadius ).show();
+			} 
+
+            if (!activeRightMouse) {
                return;
+            } else {
+
+            	if (activeEraser && activeFogOfWar) {
+            		var coordinates = getMousePos(this, e, radius)
+		            var x = coordinates.x;
+		            var y = coordinates.y;
+		            var fillColor = '#ff0000';
+		            var context = tab.find('.fogOfWarCanvas')[0].getContext('2d');
+
+		            context.fillCircle = function(x, y, radius, fillColor) {
+			            this.fillStyle = fillColor;
+			            this.beginPath();
+			            this.moveTo(x, y);
+			            this.arc(x, y, radius/2, 0, Math.PI * 2, false);
+			            this.fill();
+			        };
+
+			        ipcRenderer.send("fogOfWar-draw-erase", {"x": x, "y": y, "radius": radius, "fillColor": fillColor});
+
+		            context.globalCompositeOperation = 'destination-out';
+		            context.fillCircle(x, y, radius, fillColor);
+            	}
+
             }
-
-            var coordinates = getMousePos(this, e)
-            var x = coordinates.x ;
-            var y = coordinates.y ;
-            var radius = 10; // or whatever
-            var fillColor = '#ff0000';
-            var context = tab.find('.fogOfWarCanvas')[0].getContext('2d');
-
-            context.fillCircle = function(x, y, radius, fillColor) {
-	            this.fillStyle = fillColor;
-	            this.beginPath();
-	            this.moveTo(x, y);
-	            this.arc(x, y, radius, 0, Math.PI * 2, false);
-	            this.fill();
-	        };
-
-            context.globalCompositeOperation = 'destination-out';
-            context.fillCircle(x, y, radius, fillColor);
+            
         };
+
+        tab.find('.fogOfWarCanvas')[0].onmouseout = function(e) {
+        	$('#radiusCursor').hide();
+        };
+
+
         tab.find('.fogOfWarCanvas')[0].onmousedown = function(e) {
-            activeEraser = true;
+        	if (e.which === 3) {
+            	activeRightMouse = true;
+        	}
         };
         tab.find('.fogOfWarCanvas')[0].onmouseup = function(e) {
-            activeEraser = false;
+            activeRightMouse = false;
         };
 		
 	    $panzoom.on('panzoomchange', function(e, panzoom, transform) {
@@ -86,14 +95,47 @@ $(function(){
 		});
 	});
 
-	function getMousePos(canvas, evt) {
-	    var rect = canvas.getBoundingClientRect();
-	    console.log("client" + evt.clientX)
-	    console.log("rect" + rect.left)
-	    console.log("berechnet" + (parseFloat($panzoom.panzoom("getMatrix")[0])+1) )
+    $('body').on('click', '.fogOfWar', function(e) {
+    	var context = tab.find('.fogOfWarCanvas')[0].getContext('2d');
+    	console.log(activeFogOfWar)
+    	if (activeFogOfWar) {
+    		activeFogOfWar = false;
+    		context.clearRect(0, 0, tab.find('.imageCanvas').data("width"), tab.find('.imageCanvas').data("height"));
+	    	ipcRenderer.send("fogOfWar-change", {"width": tab.find('.imageCanvas').data("width"), "height": tab.find('.imageCanvas').data("height")});
+
+    	} else {
+    		activeFogOfWar = true;
+			context.fillStyle = "rgba(255,0,0,0.5)";
+	    	context.fillRect(0, 0, tab.find('.imageCanvas').data("width"), tab.find('.imageCanvas').data("height"));
+	    	ipcRenderer.send("fogOfWar-change", {"width": tab.find('.imageCanvas').data("width"), "height": tab.find('.imageCanvas').data("height")});
+    	}
+		
+    });
+
+    $('body').on('click', '.removePaint', function(e) {
+    	if ($(this).hasClass("active")) {
+    		activeEraser = false;
+    		$(this).removeClass("active");
+    	} else {	    		
+    		activeEraser = true;
+    		$(this).addClass("active");
+    	}
+    });
+
+    $('body').on('change', 'input[name=radius]', function(e) {
+    	radius = $(this).val();
+    });
+
+	function getMousePos(canvas, evt, radius) {
+		var diffX = ( $(canvas).parent().width() * parseFloat($panzoom.panzoom("getMatrix")[0]) - $(canvas).parent().width() ) / 2;
+    	var diffY = ( $(canvas).parent().height() * parseFloat($panzoom.panzoom("getMatrix")[3]) - $(canvas).parent().height() ) / 2;
+
+    	var oppositeMatrixTransformX = parseFloat($panzoom.panzoom("getMatrix")[4]) * -1
+    	var oppositeMatrixTransformY = parseFloat($panzoom.panzoom("getMatrix")[5]) * -1
+
 	    return {
-	      x: ((evt.clientX - parseFloat($panzoom.panzoom("getMatrix")[4])) + 5),
-	      y: ((evt.clientY - parseFloat($panzoom.panzoom("getMatrix")[5])) + 5 -50)
+	      x: ((evt.clientX + oppositeMatrixTransformX + diffX) / parseFloat($panzoom.panzoom("getMatrix")[0])),
+	      y: ((evt.clientY - topMargin + oppositeMatrixTransformY + diffY) / parseFloat($panzoom.panzoom("getMatrix")[3]))
 	    };
 	  }
 
@@ -106,6 +148,7 @@ $(function(){
           $(canvas).data("width", imageObj.naturalWidth);
   		  $(canvas).data("height", imageObj.naturalHeight);
           tab.find('.fogOfWarCanvas').attr("width",imageObj.naturalWidth).attr("height",imageObj.naturalHeight);
+          tab.find('.panzoom').attr("width",imageObj.naturalWidth).attr("height",imageObj.naturalHeight);
           $(canvas).attr("width",imageObj.naturalWidth).attr("height",imageObj.naturalHeight);
           context.drawImage(this, 0, 0);
         };

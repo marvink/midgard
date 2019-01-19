@@ -24,15 +24,8 @@
         $panzoom = $('.panzoom').panzoom();
       }); 
 
-      ipcRenderer.on('image-change-reply', function(event, arg) {        
-        //$panzoom.off('panzoomchange');
-        console.log("change")
-        
+      ipcRenderer.on('image-change-reply', function(event, arg) {                
         $panzoom.panzoom("setMatrix", arg);
-
-      /*  $panzoom.on('panzoomchange', function(e, panzoom, transform) {
-          ipcRenderer.send("image-change", transform);
-        }); */
       }); 
 
       ipcRenderer.on('viewport-change', function(event, arg) {
@@ -45,6 +38,23 @@
         context.fillStyle = "black";
         context.clearRect(0, 0, arg.width, arg.height);
         context.fillRect(0, 0, arg.width, arg.height);   
+      }); 
+
+      ipcRenderer.on('fogOfWar-draw-erase-reply', function(event, arg) { 
+
+        var context = $('.image').find('.fogOfWarCanvas')[0].getContext('2d');
+
+        context.fillCircle = function(x, y, radius, fillColor) {
+            this.fillStyle = fillColor;
+            this.beginPath();
+            this.moveTo(x, y);
+            this.arc(x, y, radius/2, 0, Math.PI * 2, false);
+            this.fill();
+        };
+
+        context.globalCompositeOperation = 'destination-out';
+        context.fillCircle(arg.x, arg.y, arg.radius, arg.fillColor);
+
       }); 
 
       ipcRenderer.on('toggle-image-reply', function(event, arg) {

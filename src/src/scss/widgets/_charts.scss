@@ -1,0 +1,24 @@
+.widget-charts {
+
+	input {
+		width:29%;
+		float:left;
+		margin-bottom:10px;
+	}
+
+	button {
+		width: 34%;
+		float:left;
+		display: block;
+		padding:1px;
+		cursor: pointer;
+
+		&.minus {			
+			margin-right: 1%
+		}
+
+		&.show {
+			width: 100%;
+		}
+	}
+}

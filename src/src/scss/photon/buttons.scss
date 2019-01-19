@@ -29,6 +29,22 @@
   width:100%;
   border-bottom: 1px solid #989698;
   -webkit-app-region: drag;
+
+  input {
+    width: 40px;
+    font-size: 10px;
+    margin-left: 10px;
+    vertical-align: top;
+  }
+
+  label {
+    width: auto;
+    float: left;
+    font-size: 10px;
+    margin-left: 10px;
+    margin-top: 3px;
+    vertical-align: top;
+  }
 }
 
 .btn-mini {

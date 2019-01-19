@@ -38,6 +38,8 @@
           <button class="btn btn-default fancybox" data-fancybox="#add-widget-randompersonen"><span title="Personennamen" class="icon fa-users"></span></button>
           <button data-id="widget-dice" class="add btn btn-default fancybox"><span title="Würfel" class="icon fa-cubes"></span></button>
           <button class="btn btn-default fancybox" data-fancybox="#add-widget-critical"><span title="Critical" class="icon fa-fire"></span></button>
+          <button data-id="widget-charts" class="add btn btn-default fancybox"><span title="Charts" class="icon fa-line-chart"></span></button>
+          <button class="btn btn-default fancybox" data-fancybox="#add-widget-handel"><span title="Handel" class="icon fa-usd"></span></button>
         </div>
         <div class="btn-group right">
           <button class="btn btn-default" onclick="remote.getCurrentWindow().minimize();">
@@ -88,6 +90,25 @@
       <div class="form-group">
         <label>Bilddatei:</label>
         <input data-type="images" class="form-control openFile" type="text" name="path"><button data-type="images" class="openFile btn btn-large btn-default" type="button">Datei wählen</button>
+      </div>
+       
+      <footer class="toolbar toolbar-footer">
+        <div class="toolbar-actions">
+          <button class="add btn btn-primary pull-right" type="button">hinzufügen</button>
+       </div>
+      </footer>
+    </form>
+  </div>
+
+  <div id="add-widget-handel" style="display: none">    
+    <form data-id="widget-handel">  
+      <div class="form-group">
+        <label>Name:</label>
+        <input class="form-control" type="text" name="name">
+      </div>    
+      <div class="form-group">
+        <label>Handelsliste:</label>
+        <input data-type="images" class="form-control openFile" type="text" name="path"><button class="openFile btn btn-large btn-default" type="button">Datei wählen</button>
       </div>
        
       <footer class="toolbar toolbar-footer">

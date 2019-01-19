@@ -1,6 +1,6 @@
 {
   "name"    : "midgard-dashboard",
-  "version" : "0.2.0",
+  "version" : "0.2.1",
   "main"    : "main.js",
   "description": "A minimal Electron application",
   "scripts": {
@@ -19,6 +19,7 @@
   "author": "GitHub",
   "license": "CC0-1.0",  
   "dependencies": {
-    "electron-settings": "^1.0.4"
+    "electron-settings": "^1.0.4",
+    "xlsx": "^0.8.0"
   }
 }
